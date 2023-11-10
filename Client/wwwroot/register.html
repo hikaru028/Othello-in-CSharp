@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf8" />
+    <title>711-Assignment2 | Register</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div>
+        <h1>Register</h1>
+        <p>Your username:</p>
+        <span id="username"><b><em>*username*</em></b></span>
+        <br /><br /><br />
+        <p class="note">✋ To start a game, you are required to use this username. <br /> Please copy it 📝.</p>
+        <br /><br />
+        <button onclick="goBack()">Back</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="gameboard.html">Game</a>
+    </div>
+
+
+    <script>
+        window.onload = function () {
+            var http = new XMLHttpRequest();
+            http.open("GET", "http://localhost:8080/register");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE) {
+                    if (http.status >= 200 && http.status < 400) {
+                        console.log("username: " + http.responseText);
+                        let username = http.responseText;
+                        console.log("username: " + username);
+                        document.getElementById('username').textContent = username;
+                    } else {
+                        console.error("Server returned error: " + http.status);
+                    }
+                }
+            };
+
+            http.send();
+        }
+
+        function goBack() {
+          window.history.back();
+        }
+    </script>
+</body>
+
+
+</html>

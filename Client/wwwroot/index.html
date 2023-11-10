@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf8" />
+    <title>711-Assignment2 | Home</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <h1>711-Assignment2</h1>
+    <br /><br />
+    <a href="register.html">Register</a>
+    <br /><br /><br /><br /><br /><br />
+    <p>Created by Hikaru Suzuki | hsuz411 | 736797288</p>
+
+
+    <script>
+        window.onload = function () {
+            let favicon = "";
+            var http = new XMLHttpRequest();
+            http.open("GET", "http://localhost:8080/favicon.ico");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE) {
+                    if (http.status >= 200 && http.status < 400) {
+                        favicon = http.responseText;
+                        console.log(favicon);
+                    } else {
+                        console.error("Server returned error: " + http.status);
+                    }
+                }
+            };
+
+            http.send();
+        }
+    </script>
+</body>
+</html>

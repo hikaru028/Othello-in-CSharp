@@ -1,0 +1,142 @@
+﻿body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    color: #333;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+p {
+    font-size: 13px;
+}
+
+a {
+    padding: 10px 20px;
+    text-decoration: none;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #333;
+    font-weight: 500;
+    font-size: 16px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+    a:hover {
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+button {
+    padding: 10px 20px;
+    text-decoration: none;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #333;
+    font-weight: 500;
+    font-size: 16px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+    button:hover {
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+
+/* Register Page */
+#username {
+    font-size: 25px;
+    font-weight: bold;
+    width: 130px;
+    padding: 8px 15px;
+    margin: auto;
+    border: 1px dotted black;
+    border-radius: 5px;
+}
+
+
+/* Game Page */
+.gameBoardContainer {
+    margin: auto;
+    padding: 20px;
+    width: 80vw;
+    height: 100%;
+    background-color: #DBE9FA;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.backgroundLayer {
+    width: 338px;
+    height: 338px;
+    margin: auto;
+    position: relative;
+    background-color: black;
+    border: 5px solid black;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.disk {
+    z-index: 1;
+}
+
+.canMoveLayer {
+    z-index: 2;
+}
+
+.score {
+    font-size: 1.2em;
+    font-weight: 400;
+}
+
+.explanationContainer {
+    text-align: left;
+    padding: 3px 20px;
+    margin: 10px 0;
+    border: 1px dotted gray;
+    border-radius: 10px;
+}
+
+    .explanationContainer a {
+        padding: 0;
+        text-decoration: none;
+        border: none;
+        border-radius: 0;
+        color: blue;
+        font-weight: 200;
+        box-shadow: none;
+        font-size: 13px;
+    }
+
+#operationContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+    #operationContainer input, #operationContainer button {
+        padding: 5px 8px;
+        text-decoration: none;
+        border: 1px solid #333;
+        border-radius: 5px;
+        color: #333;
+        font-weight: 300;
+        font-size: 13px;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+        cursor: pointer;
+    }
+
+        #operationContainer button:hover {
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }

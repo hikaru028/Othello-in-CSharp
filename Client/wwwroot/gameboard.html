@@ -1,0 +1,570 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>711-Assignment2 | Gameboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="gameBoardContainer">
+        <!--Board-->
+        <div class="backgroundLayer">
+            <div class="diskLayer"></div>
+            <div class="disk"></div>
+            <div class="canMoveLayer"></div>
+        </div>
+
+        <!--Score-->
+        <div class="score">Black⚫️: 2 / White⚪️: 2</div>
+        <br /><br />
+
+        <!--Explanation-->
+        <div class="explanationContainer">
+            <p>
+                ⚠️ To play, you need a valid username. This needs to be obtained from <a href="http://localhost:8081/register.html">http://localhost:8081/register</a>. Use this username for the entire play session.<br /><br />
+                📝 RULES<br />
+                ① The game starts with four (two each) disks placed in the center of the board in a square pattern.<br />
+                ② Black always moves first.<br />
+                ③ Players take turns placing a disk on the board, with the goal of flipping their opponent's disks to their own color by surrounding them with their own disks.<br />
+                ④ A disk is flipped when it is surrounded on two opposite sides by disks of the opposing color.<br />
+                ⑤ A player must make a move if they have a legal move available. If they do not have a legal move, they must pass their turn.<br />
+                ⑥ The game ends when there are no more legal moves for either player, or when the board is full.<br />
+                ⑦ The player with the most disks of their color on the board at the end of the game wins.<br />
+                ⚡️ It is possible for a game to end before all 64 squares are filled.
+            </p>
+        </div>
+
+        <!--Operation-->
+        <div id="operationContainer">
+            <button onclick="goBack()">Back</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <input id="usernameInput" type="text" placeholder="Enter your username" />&nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="tryGameButton" onclick="tryGame()">Try Game</button>
+        </div>
+
+        <br /><br />
+
+        <!--Message-->
+        <div id="messageContainer">
+            To start, specify a valid username, and click "Try Game" button.
+        </div>
+
+        <br /><br /><br />
+
+    </div>
+
+
+
+
+
+    <!-- ******************** JavaScript Section ********************** -->
+    <script>
+        const httpRquest = new XMLHttpRequest();
+        let request = "";
+        let backgroundLayer = document.getElementsByClassName('backgroundLayer')[0];
+        let diskLayer = document.getElementsByClassName('diskLayer')[0];
+        let canMoveLayer = document.getElementsByClassName('canMoveLayer')[0];
+        let score = document.getElementsByClassName('score')[0];
+        let gameId = "";
+        let username = "";
+        let player1 = "";
+        let player2 = "";
+        let move = "";
+        let playerColor = "";
+        let isMyturn = false;
+        let isMoveUpdated = false;
+        let canSendMove = false;
+        let canGetMove = false;
+        let gameOver = false;
+        let cellSize = 40;
+        let gap = 2;
+        let turn = 1;
+        const disks = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 2, 1, 0, 0, 0],
+            [0, 0, 0, 1, 2, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+
+
+        window.onload = function () {
+            drawCells();
+            drawDisks();
+        }
+
+
+        function drawCells() {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    let square = document.createElement("div");
+                    square.style.position = "absolute";
+                    square.style.width = `${cellSize}px`;
+                    square.style.height = `${cellSize}px`;
+                    square.style.backgroundColor = "green";
+                    square.style.left = `${(cellSize + gap) * col + gap}px`;
+                    square.style.top = `${(cellSize + gap) * row + gap}px`;
+                    if (player1 !== "" && player2 !== "" && isMyturn) {
+                        square.setAttribute("onclick", "clickedSqure(" + row + ", " + col + ")");   
+                    }
+
+                    backgroundLayer.appendChild(square);
+                }
+            }
+        }
+
+
+        function drawDisks() {
+            diskLayer.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    let value = disks[row][col];
+                    if (value == 0) {
+                        continue;
+                    } else {
+                        let disk = document.createElement('div');
+                        disk.classList.add('disk');
+                        disk.style.position = 'absolute';
+                        disk.style.width = `${cellSize}px`;
+                        disk.style.height = `${cellSize}px`;
+                        disk.style.borderRadius = '50%';
+                        disk.style.left = `${(cellSize + gap) * col + gap}px`;
+                        disk.style.top = `${(cellSize + gap) * row + gap}px`;
+
+                        if (value == 1) {
+                            disk.style.backgroundColor = 'black';
+                        } else if (value == 2) {
+                            disk.style.backgroundColor = 'white';
+                        }
+
+                        diskLayer.appendChild(disk);
+                    }
+                }
+            }
+        }
+
+
+        function clickedSqure(row, col) {
+            if (gameOver) {
+                return;
+            }
+
+            if (disks[row][col] != 0) {
+                return;
+            }
+
+            if (canClickSpot(turn, row, col) == true) {
+                move = `${row}, ${col}`;
+                isMoveUpdated = true;
+                canSendMove = true;
+
+                let affectedDisks = getAffectedDisks(turn, row, col);
+                flipDisks(affectedDisks);
+                disks[row][col] = turn;
+
+                if (turn == 1 && canMove(2)) {
+                    turn = 2;
+                } else if (turn == 2 && canMove(1)) {
+                    turn = 1;
+                } else if (canMove(1) == false && canMove(2) == false) {
+                    if (window.confirm('GAME OVER! Do you want to try a new game?')) {
+                        gameOver = true;
+                        window.history.back();
+                    }
+                }
+            }
+            drawDisks();
+            drawCanMoveLayer();
+            reCountScore();
+        }
+
+
+        function drawCanMoveLayer() {
+            canMoveLayer.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    let value = disks[row][col];
+                    if (value == 0 && canClickSpot(turn, row, col)) {
+                        let canPlaceDisk = document.createElement('div');
+                        canPlaceDisk.style.position = 'absolute';
+                        canPlaceDisk.style.width = `${cellSize - 1}px`;
+                        canPlaceDisk.style.height = `${cellSize - 1}px`;
+                        canPlaceDisk.style.borderRadius = '50%';
+                        canPlaceDisk.style.left = `${(cellSize + gap) * col + gap}px`;
+                        canPlaceDisk.style.top = `${(cellSize + gap) * row + gap}px`;
+                        canPlaceDisk.style.zIndex = 2;
+                        if (isMyturn) {
+                            canPlaceDisk.setAttribute("onclick", "clickedSqure(" + row + ", " + col + ")");
+                        }
+                       
+                        if (username == player1 && turn == 1) {
+                            canPlaceDisk.style.border = '1px solid black';
+                            canPlaceDisk.style.backgroundColor = 'rgb(0, 0, 0, 0.2)';
+                        }
+                                             
+                        if (username == player2 && turn == 2) {
+                            canPlaceDisk.style.border = '1px solid white';
+                            canPlaceDisk.style.backgroundColor = 'rgb(225, 225, 225, 0.2)';
+                        }
+                       
+                        canMoveLayer.appendChild(canPlaceDisk);
+                    }
+                }
+            }
+            isMyturn = false;
+        }
+
+
+        // To change the turn
+        function canMove(id) {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    if (canClickSpot(id, row, col)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        // To show the cell that is able to place currently
+        function canClickSpot(id, row, col) {
+            let affectedDisks = getAffectedDisks(id, row, col);
+            if (affectedDisks.length == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+
+        // To counst the number of disks
+        function reCountScore() {
+            let ones = 0;
+            let twos = 0;
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    let value = disks[row][col];
+
+                    if (value == 1) {
+                        ones += 1;
+                    } else if (value == 2) {
+                        twos += 1;
+                    }
+                }
+            }
+            score.innerHTML = "Black⚫️: " + ones + " / White⚪️: " + twos;
+        }
+
+
+        // To flip the opponent disks
+        function flipDisks(affectedDisks) {
+            for (let i = 0; i < affectedDisks.length; i++) {
+                let spot = affectedDisks[i];
+                if (disks[spot.row][spot.col] == 1) {
+                    disks[spot.row][spot.col] = 2;
+                } else {
+                    disks[spot.row][spot.col] = 1;
+                }
+            }
+        }
+
+        function getAffectedDisks(id, row, col) {
+            let affectedDisks = [];
+
+            // To the "Right"
+            let couldBeAffected = [];
+            let columnIterator = col;
+
+            while (columnIterator < 7) {
+                columnIterator += 1;
+                let valueAtSpot = disks[row][columnIterator];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: row, col: columnIterator };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // To the "Left"
+            couldBeAffected = [];
+            columnIterator = col;
+
+            while (columnIterator > 0) {
+                columnIterator -= 1;
+                let valueAtSpot = disks[row][columnIterator];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: row, col: columnIterator };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // To the "Up"
+            couldBeAffected = [];
+            let rowIterator = row;
+
+            while (rowIterator > 0) {
+                rowIterator -= 1;
+                let valueAtSpot = disks[rowIterator][col];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: rowIterator, col: col };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // To the "Down"
+            couldBeAffected = [];
+            rowIterator = row;
+
+            while (rowIterator < 7) {
+                rowIterator += 1;
+                let valueAtSpot = disks[rowIterator][col];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: rowIterator, col: col };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // "Down-Right"
+            couldBeAffected = [];
+            rowIterator = row;
+            columnIterator = col;
+
+            while (rowIterator < 7 && columnIterator < 7) {
+                rowIterator += 1;
+                columnIterator += 1;
+                let valueAtSpot = disks[rowIterator][columnIterator];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: rowIterator, col: columnIterator };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // "Down-Left"
+            couldBeAffected = [];
+            rowIterator = row;
+            columnIterator = col;
+
+            while (rowIterator < 7 && columnIterator > 0) {
+                rowIterator += 1;
+                columnIterator -= 1;
+                let valueAtSpot = disks[rowIterator][columnIterator];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: rowIterator, col: columnIterator };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // "Up-Left"
+            couldBeAffected = [];
+            rowIterator = row;
+            columnIterator = col;
+
+            while (rowIterator > 0 && columnIterator > 0) {
+                rowIterator -= 1;
+                columnIterator -= 1;
+                let valueAtSpot = disks[rowIterator][columnIterator];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: rowIterator, col: columnIterator };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+
+            // "Up-Right"
+            couldBeAffected = [];
+            rowIterator = row;
+            columnIterator = col;
+
+            while (rowIterator > 0 && columnIterator < 7) {
+                rowIterator -= 1;
+                columnIterator += 1;
+                let valueAtSpot = disks[rowIterator][columnIterator];
+
+                if (valueAtSpot == 0 || valueAtSpot == id) {
+                    if (valueAtSpot == id) {
+                        affectedDisks = affectedDisks.concat(couldBeAffected);
+                    }
+                    break;
+                } else {
+                    let diskLocation = { row: rowIterator, col: columnIterator };
+                    couldBeAffected.push(diskLocation);
+                }
+            }
+            return affectedDisks;
+        }
+
+
+        // To check the value input, then call checkGameStatus() function
+        function tryGame() {
+            username = document.getElementById('usernameInput').value;
+            if (!username) {
+                alert('Please enter your username.');
+                return;
+            }
+
+            request = `http://localhost:8080/pairme?player=${username}`;
+            sendRequest(request);
+
+            httpRquest.onload = function () {
+                if (httpRequest.status === 200) {
+                    const response = JSON.parse(httpRquest.responseText);
+                    if (response == "Invalid player") {
+                        alert("Please check your username.");
+                    } else {
+                        console.log(response);
+                        gameId = response.gameId;
+                        player1 = response.player1;
+                        player2 = response.player2;
+                        if (username == player1) {
+                            isMyturn = true;
+                        }
+                    }
+
+                    if (player2 !== "" && player2 !== null) {
+                        drawCanMoveLayer();
+                    }
+
+                    const operationContainer = document.getElementById('operationContainer');
+                    operationContainer.innerHTML = `
+                            <button onclick="goBack()">Back</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="text" value="${username == player1 ? player1 : player2}" readonly />&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="moveBtn" onclick="checkMove()" > ${username == player1 ? "Send My Move" : "Get Opponent Move"}</button >&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button onclick="goBack()">Quit Game</button>
+                        `;
+
+                    const messageContainer = document.getElementById('messageContainer');
+                    if (player1 !== "" && (player2 == "" || player2 == null)) {
+                        messageContainer.innerHTML = "Waiting for another player...";
+                    } else if (player1 !== "" && (player2 !== "" || player2 !== null)) {
+                        messageContainer.innerHTML = `
+                                Great ${username} 😁, you are playing with ${username == player1 ? player2 : player1} 😎.<br />
+                                Your disk is ${username == player1 ? "Black⚫️" : "White⚪️"}. Good luck!👍
+                            `;
+                    }
+                } else {
+                    alert(`Error ${httpRquest.status}: ${httpRquest.statusText}`);
+                }
+            };
+
+            drawDisks();
+            reCountScore();
+        }
+
+        // To upload onw movement or retrieve the opponent move
+        function checkMove() {
+            const moveButton = document.getElementsByClassName('moveBtn')[0];
+
+            if (isMoveUpdated && canSendMove) {
+                request = `http://localhost:8080/mymove?player=${username}&id=${gameId}&move=${move}`;
+                sendRequest(request);
+
+                httpRquest.onload = function () {
+                    if (httpRquest.status === 200) {
+                        try {
+                            const response = JSON.parse(httpRquest.responseText);
+                            console.log(response);
+                        } catch (e) {
+                            console.log('The server response is not in JSON format');
+                        }
+                    }
+                };
+
+                if (isMoveUpdated) {
+                    moveButton.innerHTML = "Get Opponent Move";
+                    canSendMove = false;
+                    isMoveUpdated = false;
+                }
+            } else {
+                request = `http://localhost:8080/theirmove?player=${username}&id=${gameId}`;
+                sendRequest(request);
+
+                let getRow = 0;
+                let getCol = 0;
+                httpRquest.onload = function () {
+                    if (httpRquest.status === 200) {
+                        try {
+                            let response = JSON.parse(httpRquest.responseText);
+                            let numbers = response.opponentMove.split(',');
+                            getRow = parseInt(numbers[0], 10);
+                            getCol = parseInt(numbers[1], 10);
+                            clickedSqure(getRow, getCol);
+                        } catch (e) {
+                            console.log('The server response is not in JSON format');
+                        }
+                    }
+                };
+
+                moveButton.innerHTML = "Send My Move";
+                isMyturn = true;
+            }
+        }
+
+
+        // To go back to the previous page and quit the current game
+        function goBack() {
+            if (username == "" && gameId == "") {
+                window.history.back();
+            } else {
+                if (window.confirm('Are you sure you want to quit the game?')) {
+                    request = `http://localhost:8080/quit?player=${username}&id=${gameId}`;
+                    sendRequest(request);
+                    window.history.back();
+                }
+            }
+        }
+
+
+        function sendRequest(request) {
+            httpRquest.open('GET', request);
+            httpRquest.setRequestHeader('Content-Type', 'application/json');
+            httpRquest.send();
+        }
+
+    </script>
+</body>
+</html>

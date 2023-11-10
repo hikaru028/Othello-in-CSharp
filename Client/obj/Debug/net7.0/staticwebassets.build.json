@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "Hash": "b/gc4WKpdLt2nROOWKPSGDjv9SzYQY18dP1bq408AsI=",
+  "Source": "Client",
+  "BasePath": "_content/Client",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Client/wwwroot",
+      "Source": "Client",
+      "ContentRoot": "/Users/hikaru/Desktop/A2/Client/wwwroot/",
+      "BasePath": "_content/Client",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/hikaru/Desktop/A2/Client/wwwroot/gameboard.html",
+      "SourceId": "Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/hikaru/Desktop/A2/Client/wwwroot/",
+      "BasePath": "_content/Client",
+      "RelativePath": "gameboard.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/gameboard.html"
+    },
+    {
+      "Identity": "/Users/hikaru/Desktop/A2/Client/wwwroot/index.html",
+      "SourceId": "Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/hikaru/Desktop/A2/Client/wwwroot/",
+      "BasePath": "_content/Client",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/index.html"
+    },
+    {
+      "Identity": "/Users/hikaru/Desktop/A2/Client/wwwroot/register.html",
+      "SourceId": "Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/hikaru/Desktop/A2/Client/wwwroot/",
+      "BasePath": "_content/Client",
+      "RelativePath": "register.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/register.html"
+    },
+    {
+      "Identity": "/Users/hikaru/Desktop/A2/Client/wwwroot/styles.css",
+      "SourceId": "Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/hikaru/Desktop/A2/Client/wwwroot/",
+      "BasePath": "_content/Client",
+      "RelativePath": "styles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/styles.css"
+    }
+  ]
+}

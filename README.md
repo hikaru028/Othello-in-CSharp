@@ -1,1 +1,1 @@
-# Realtime-2Players-OthelloGame-with-C-
+# Realtime-2Players-OthelloGame-with-CSharp

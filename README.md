@@ -1,4 +1,4 @@
-# Realtime 2Players OthelloGame in C#
+# Two-player Othello Game in C#
 
 ## Overview
 This project is a multithreaded game server for a two-player Othello game. The server pairs up players and coordinates the exchange of game moves. It is built using the C# programming language and .NET 7, employing synchronous server sockets for communication. The server interacts with game clients through HTTP REST endpoints.
